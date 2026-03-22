@@ -57,7 +57,7 @@
 
 /* ---- Reset ---- */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; }
+html { scroll-behavior: smooth; scroll-snap-type: y proximity; }
 body {
   background: var(--navy);
   color: var(--white);
@@ -223,7 +223,7 @@ img { display: block; max-width: 100%; }
   grid-template-columns: 1fr 1fr;
   align-items: center;
   gap: 4rem;
-  padding: 8rem 2.5rem 4rem;
+  padding: 6rem 2.5rem 3rem;
   max-width: 1240px;
   margin: 0 auto;
   position: relative;
@@ -554,7 +554,7 @@ img { display: block; max-width: 100%; }
    STATEMENT SECTION
    ============================================================ */
 .statement-section {
-  padding: 12vh 2.5rem;
+  padding: 6vh 2.5rem;
 }
 .statement-inner {
   max-width: 860px;
@@ -586,7 +586,7 @@ img { display: block; max-width: 100%; }
    FEATURES SECTION
    ============================================================ */
 .features-section {
-  padding: 8rem 2.5rem;
+  padding: 4.5rem 2.5rem;
 }
 .features-header {
   text-align: center;
@@ -825,7 +825,7 @@ img { display: block; max-width: 100%; }
    TRUST SECTION  (light)
    ============================================================ */
 .trust-section {
-  padding: 9rem 2.5rem;
+  padding: 5rem 2.5rem;
   background: var(--off-white);
   color: var(--navy);
 }
@@ -857,11 +857,12 @@ img { display: block; max-width: 100%; }
   line-height: 1.78;
 }
 
+
 /* ============================================================
    CTA SECTION
    ============================================================ */
 .cta-section {
-  padding: 11rem 2.5rem;
+  padding: 6rem 2.5rem;
   text-align: center;
   position: relative;
   overflow: hidden;
@@ -925,6 +926,15 @@ img { display: block; max-width: 100%; }
 /* ============================================================
    MOBILE RESPONSIVE
    ============================================================ */
+.hero,
+.statement-section,
+.features-section,
+.trust-section,
+.cta-section {
+  scroll-snap-align: start;
+  scroll-snap-stop: normal;
+}
+
 @media (max-width: 900px) {
   .hero {
     grid-template-columns: 1fr;
@@ -1458,6 +1468,27 @@ gsap.to('.trust-card', {
   }
 });
 
+
+/* ============================================================
+   STATEMENT & TRUST — short GSAP pins for magnetic resistance
+   ============================================================ */
+ScrollTrigger.create({
+  trigger: '.statement-section',
+  start: 'top top',
+  end: '+=60%',
+  pin: true,
+  pinSpacing: false,
+  anticipatePin: 1,
+});
+
+ScrollTrigger.create({
+  trigger: '.trust-section',
+  start: 'top top',
+  end: '+=60%',
+  pin: true,
+  pinSpacing: false,
+  anticipatePin: 1,
+});
 /* ============================================================
    CTA SECTION — cinematic reveal
    ============================================================ */
