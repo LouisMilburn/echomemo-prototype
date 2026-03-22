@@ -764,17 +764,21 @@ img { display: block; max-width: 100%; }
 
 /* Step cards */
 .how-steps {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1.5rem;
+  position: relative;
+  min-height: 380px;
 }
 .how-step {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  max-width: 560px;
   background: rgba(255,255,255,0.028);
   border: 1px solid var(--border);
   border-radius: 22px;
   padding: 2.5rem;
   will-change: transform, opacity;
-  transform: translateY(28px);
   opacity: 0;
 }
 .hs-number {
@@ -952,10 +956,6 @@ img { display: block; max-width: 100%; }
   }
   .feature-block.flip { direction: ltr; }
   .feature-visual { min-height: 180px; }
-
-  .how-steps {
-    grid-template-columns: 1fr;
-  }
 
   .trust-grid { grid-template-columns: 1fr; }
 
@@ -1399,50 +1399,49 @@ document.querySelectorAll('.feature-block').forEach((block) => {
 });
 
 /* ============================================================
-   HOW IT WORKS — pinned section, steps reveal with scroll
+   HOW IT WORKS — one step at a time, snap between each
    ============================================================ */
 gsap.set('.how-header', { opacity: 0, y: 32 });
+gsap.set(['.hs-1', '.hs-2', '.hs-3'], { opacity: 0, y: 32 });
 
+// Timeline total: 3 units. Snap points at 0, 1/3, 2/3, 1
+// → each third = one full step "page"
 const howTl = gsap.timeline({
   scrollTrigger: {
     trigger: '.how-section',
     start: 'top top',
-    end: '+=220%',
+    end: '+=300%',
     pin: true,
-    scrub: 1.2,
+    scrub: 1,
     anticipatePin: 1,
+    snap: {
+      snapTo: [0, 1/3, 2/3, 1],
+      duration: { min: 0.2, max: 0.5 },
+      delay: 0.05,
+      ease: 'power1.inOut',
+    },
+    onUpdate: (self) => {
+      document.querySelector('.how-progress-fill').style.width =
+        `${self.progress * 100}%`;
+    }
   }
 });
 
 howTl
-  // Header fades in
-  .to('.how-header', { opacity: 1, y: 0, duration: 0.5 })
-  // Step 1 animates in
-  .to('.hs-1', {
-    opacity: 1, y: 0, duration: 0.5,
-    borderColor: 'rgba(62,207,178,0.35)',
-  }, '+=0.1')
-  // Step 2
-  .to('.hs-2', {
-    opacity: 1, y: 0, duration: 0.5,
-    borderColor: 'rgba(62,207,178,0.35)',
-  }, '+=0.3')
-  // Step 3
-  .to('.hs-3', {
-    opacity: 1, y: 0, duration: 0.5,
-    borderColor: 'rgba(62,207,178,0.35)',
-  }, '+=0.3');
+  // Phase 1 (t 0→1): header + step 1
+  .to('.how-header', { opacity: 1, y: 0, duration: 0.4, ease: 'power3.out' }, 0)
+  .to('.hs-1', { opacity: 1, y: 0, borderColor: 'rgba(62,207,178,0.35)', duration: 0.5, ease: 'power3.out' }, 0.35)
 
-// Progress bar tracks overall timeline progress
-ScrollTrigger.create({
-  trigger: '.how-section',
-  start: 'top top',
-  end: '+=220%',
-  onUpdate: (self) => {
-    document.querySelector('.how-progress-fill').style.width =
-      `${self.progress * 100}%`;
-  }
-});
+  // Phase 2 (t 1→2): step 1 out, step 2 in
+  .to('.hs-1', { opacity: 0, y: -24, duration: 0.3 }, 1.0)
+  .to('.hs-2', { opacity: 1, y: 0, borderColor: 'rgba(62,207,178,0.35)', duration: 0.5, ease: 'power3.out' }, 1.35)
+
+  // Phase 3 (t 2→3): step 2 out, step 3 in
+  .to('.hs-2', { opacity: 0, y: -24, duration: 0.3 }, 2.0)
+  .to('.hs-3', { opacity: 1, y: 0, borderColor: 'rgba(62,207,178,0.35)', duration: 0.5, ease: 'power3.out' }, 2.35)
+
+  // Pad timeline to exactly 3.0 so snap points align correctly
+  .to({}, { duration: 0.01 }, 2.99);
 
 /* ============================================================
    TRUST SECTION — cards stagger in
