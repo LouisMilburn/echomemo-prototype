@@ -1,0 +1,1488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EchoMemo — Pastoral Reports, Effortlessly</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet" />
+  <!-- GSAP + ScrollTrigger -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <style>
+/* ============================================================
+   ECHOMEMO — PROTOTYPE MARKETING SITE
+   Apple-style scroll-animated landing page
+   ============================================================ */
+
+:root {
+  --navy:        #0F1F3D;
+  --navy-deep:   #091529;
+  --navy-light:  #162848;
+  --teal:        #3ECFB2;
+  --teal-dim:    rgba(62, 207, 178, 0.12);
+  --teal-glow:   rgba(62, 207, 178, 0.35);
+  --off-white:   #F7F9FC;
+  --white:       #ffffff;
+  --muted:       rgba(255, 255, 255, 0.45);
+  --dim:         rgba(255, 255, 255, 0.65);
+  --border:      rgba(255, 255, 255, 0.07);
+  --border-mid:  rgba(255, 255, 255, 0.12);
+  --font-serif:  'DM Serif Display', serif;
+  --font-sans:   'Sora', sans-serif;
+  --ease:        cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ---- Reset ---- */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--navy);
+  color: var(--white);
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.6;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+a { text-decoration: none; }
+img { display: block; max-width: 100%; }
+
+/* ============================================================
+   TYPOGRAPHY UTILITIES
+   ============================================================ */
+.section-label {
+  display: inline-block;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--teal);
+  margin-bottom: 1rem;
+}
+.section-title {
+  font-family: var(--font-serif);
+  font-size: clamp(2.4rem, 4.5vw, 4.25rem);
+  line-height: 1.08;
+  color: var(--white);
+  margin-bottom: 1.25rem;
+}
+.section-title em { font-style: italic; color: var(--teal); }
+.section-sub {
+  font-size: 1.0625rem;
+  color: var(--dim);
+  max-width: 480px;
+  line-height: 1.75;
+}
+
+/* Dark-section overrides (trust section) */
+.dark-label  { color: rgba(15,31,61,0.45); }
+.dark-title  { color: var(--navy); }
+.dark-em     { color: #1d6b5a; }
+.dark-sub    { color: rgba(15,31,61,0.55); }
+
+/* ============================================================
+   BUTTONS
+   ============================================================ */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--teal);
+  color: var(--navy);
+  font-family: var(--font-sans);
+  font-size: 0.9375rem;
+  font-weight: 700;
+  padding: 0.875rem 2rem;
+  border-radius: 100px;
+  transition: all 0.3s var(--ease);
+  white-space: nowrap;
+  border: none;
+  cursor: pointer;
+}
+.btn-primary:hover {
+  background: #5addc6;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 32px rgba(62, 207, 178, 0.38);
+}
+.btn-primary.btn-large {
+  font-size: 1.0625rem;
+  padding: 1.0625rem 2.75rem;
+}
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: transparent;
+  color: var(--dim);
+  font-family: var(--font-sans);
+  font-size: 0.9375rem;
+  font-weight: 500;
+  padding: 0.875rem 1.5rem;
+  border-radius: 100px;
+  border: 1px solid var(--border-mid);
+  transition: all 0.3s var(--ease);
+  cursor: pointer;
+}
+.btn-ghost:hover {
+  color: var(--white);
+  border-color: rgba(255,255,255,0.25);
+  background: rgba(255,255,255,0.05);
+}
+.btn-ghost .arrow { transition: transform 0.3s; display: inline-block; }
+.btn-ghost:hover .arrow { transform: translateY(3px); }
+
+/* ============================================================
+   NAV
+   ============================================================ */
+.nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 200;
+  padding: 1.375rem 2.5rem;
+  transition: padding 0.4s var(--ease), background 0.4s var(--ease), border-color 0.4s var(--ease);
+  border-bottom: 1px solid transparent;
+}
+.nav.scrolled {
+  background: rgba(9, 21, 41, 0.82);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-bottom-color: var(--border);
+  padding: 0.9rem 2.5rem;
+}
+.nav-inner {
+  max-width: 1240px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.nav-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--white);
+  font-weight: 600;
+  font-size: 1.0625rem;
+  letter-spacing: -0.02em;
+}
+.logo-mark { color: var(--teal); font-size: 1.3rem; }
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 2.25rem;
+}
+.nav-links a {
+  color: var(--dim);
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+.nav-links a:hover { color: var(--white); }
+.nav-cta {
+  background: rgba(255,255,255,0.07) !important;
+  color: var(--white) !important;
+  padding: 0.5rem 1.375rem;
+  border-radius: 100px;
+  border: 1px solid var(--border-mid) !important;
+  transition: all 0.3s var(--ease) !important;
+}
+.nav-cta:hover {
+  background: rgba(255,255,255,0.13) !important;
+}
+
+/* ============================================================
+   HERO
+   ============================================================ */
+.hero {
+  min-height: 100svh;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  gap: 4rem;
+  padding: 8rem 2.5rem 4rem;
+  max-width: 1240px;
+  margin: 0 auto;
+  position: relative;
+}
+
+/* Ambient grid */
+.hero-bg-grid {
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(62,207,178,0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(62,207,178,0.025) 1px, transparent 1px);
+  background-size: 64px 64px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Radial glow behind hero */
+.hero-glow {
+  position: absolute;
+  top: 10%;
+  right: 0;
+  width: 700px;
+  height: 700px;
+  background: radial-gradient(ellipse at center, rgba(62,207,178,0.07) 0%, transparent 68%);
+  pointer-events: none;
+  will-change: transform;
+}
+
+.hero-content {
+  position: relative;
+  z-index: 1;
+}
+
+/* Badge */
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(62, 207, 178, 0.09);
+  border: 1px solid rgba(62, 207, 178, 0.22);
+  color: var(--teal);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  padding: 0.375rem 1rem;
+  border-radius: 100px;
+  margin-bottom: 2rem;
+}
+.badge-dot {
+  width: 7px;
+  height: 7px;
+  background: var(--teal);
+  border-radius: 50%;
+  box-shadow: 0 0 8px var(--teal);
+  animation: blink 2.2s ease-in-out infinite;
+}
+@keyframes blink {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.4; transform: scale(0.75); }
+}
+
+/* Title */
+.hero-title {
+  font-family: var(--font-serif);
+  font-size: clamp(3.5rem, 6.5vw, 6.25rem);
+  line-height: 1.0;
+  letter-spacing: -0.02em;
+  margin-bottom: 1.75rem;
+}
+.title-line  { display: block; }
+.teal-line   { color: var(--teal); font-style: italic; }
+.word        { display: inline-block; margin-right: 0.2em; will-change: transform, opacity; }
+.italic-word { font-style: italic; }
+
+.hero-sub {
+  font-size: 1.125rem;
+  color: var(--dim);
+  line-height: 1.8;
+  max-width: 460px;
+  margin-bottom: 2.5rem;
+  will-change: transform, opacity;
+}
+.hero-cta-group {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+  flex-wrap: wrap;
+  will-change: transform, opacity;
+}
+
+/* ---- Hero visual (right column) ---- */
+.hero-visual {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 460px;
+}
+
+/* Phone */
+.phone-mockup {
+  position: relative;
+  width: 230px;
+  will-change: transform;
+}
+.phone-frame {
+  background: linear-gradient(160deg, #1c3060 0%, #0c1c38 100%);
+  border-radius: 44px;
+  padding: 14px;
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.09),
+    0 50px 100px rgba(0,0,0,0.65),
+    inset 0 1px 0 rgba(255,255,255,0.12);
+}
+.phone-notch {
+  width: 90px;
+  height: 6px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 3px;
+  margin: 0 auto 14px;
+}
+.phone-screen {
+  background: #070e1e;
+  border-radius: 32px;
+  padding: 0 16px 0;
+  min-height: 390px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  overflow: hidden;
+  position: relative;
+}
+.app-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 16px 0 0;
+}
+.app-title {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--dim);
+  letter-spacing: 0.06em;
+}
+.app-status-dot {
+  width: 7px; height: 7px;
+  background: var(--teal);
+  border-radius: 50%;
+  box-shadow: 0 0 8px var(--teal);
+  animation: blink 1.8s ease-in-out infinite;
+}
+.app-waveform {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: 52px;
+  padding: 4px 0;
+}
+.wave-bar {
+  width: 5px;
+  background: var(--teal);
+  border-radius: 3px;
+  opacity: 0.75;
+  animation: wave-anim 1.4s ease-in-out infinite;
+}
+.wave-bar:nth-child(1) { animation-delay: 0.00s; }
+.wave-bar:nth-child(2) { animation-delay: 0.10s; }
+.wave-bar:nth-child(3) { animation-delay: 0.20s; }
+.wave-bar:nth-child(4) { animation-delay: 0.30s; }
+.wave-bar:nth-child(5) { animation-delay: 0.40s; }
+.wave-bar:nth-child(6) { animation-delay: 0.30s; }
+.wave-bar:nth-child(7) { animation-delay: 0.20s; }
+.wave-bar:nth-child(8) { animation-delay: 0.10s; }
+.wave-bar:nth-child(9) { animation-delay: 0.00s; }
+@keyframes wave-anim {
+  0%, 100% { height: 10px; }
+  50%       { height: 44px; }
+}
+.app-record-btn {
+  position: relative;
+  width: 78px; height: 78px;
+  display: flex; align-items: center; justify-content: center;
+  margin: 4px 0;
+}
+.record-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1.5px solid rgba(62, 207, 178, 0.3);
+  animation: ring-out 2.2s ease-out infinite;
+}
+.record-ring.r2 { animation-delay: 1.1s; }
+.record-core {
+  width: 56px; height: 56px;
+  background: var(--teal);
+  border-radius: 50%;
+  box-shadow: 0 0 24px rgba(62,207,178,0.55);
+}
+@keyframes ring-out {
+  0%   { transform: scale(0.85); opacity: 0.6; }
+  100% { transform: scale(1.65); opacity: 0; }
+}
+.app-label {
+  font-size: 0.625rem;
+  color: var(--muted);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.app-bottom-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  width: 100%;
+  border-top: 1px solid rgba(255,255,255,0.05);
+  padding: 10px 0 14px;
+  margin-top: auto;
+}
+.app-tab {
+  font-size: 0.5625rem;
+  font-weight: 600;
+  color: var(--muted);
+  letter-spacing: 0.06em;
+}
+.app-tab.active { color: var(--teal); }
+
+/* Floating report card */
+.report-card {
+  position: absolute;
+  right: -20px;
+  bottom: 24px;
+  width: 188px;
+  background: rgba(255,255,255,0.035);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 14px;
+  overflow: hidden;
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  box-shadow: 0 24px 48px rgba(0,0,0,0.45);
+  will-change: transform;
+}
+.report-card-header {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 9px 11px;
+  background: rgba(255,255,255,0.035);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.dot { width: 7px; height: 7px; border-radius: 50%; }
+.dot.red   { background: #ff5f57; }
+.dot.amber { background: #febc2e; }
+.dot.green { background: #28c840; }
+.report-filename {
+  font-size: 0.5rem;
+  color: var(--muted);
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.report-card-body {
+  padding: 10px 11px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.report-label-tag {
+  font-size: 0.5rem;
+  font-weight: 700;
+  color: var(--teal);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-bottom: 2px;
+}
+.rline { height: 5px; background: rgba(255,255,255,0.1); border-radius: 3px; }
+.rline.lg { width: 90%; }
+.rline.md { width: 68%; }
+.rline.sm { width: 48%; }
+.rspacer  { height: 3px; }
+.rtag {
+  font-size: 0.5625rem;
+  color: var(--muted);
+  padding: 3px 7px;
+  background: rgba(255,255,255,0.04);
+  border-radius: 5px;
+  border: 1px solid rgba(255,255,255,0.07);
+}
+.rtag.teal-tag {
+  color: var(--teal);
+  background: rgba(62,207,178,0.07);
+  border-color: rgba(62,207,178,0.2);
+}
+.floating-card { animation: float 4.5s ease-in-out infinite; }
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-12px); }
+}
+
+/* Scroll hint */
+.scroll-hint {
+  position: absolute;
+  bottom: 2rem; left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--muted);
+  font-size: 0.625rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.scroll-line {
+  width: 1px; height: 44px;
+  background: linear-gradient(to bottom, var(--teal), transparent);
+  animation: scroll-pulse 2.2s ease-in-out infinite;
+}
+@keyframes scroll-pulse {
+  0%, 100% { opacity: 1; transform: scaleY(1); transform-origin: top; }
+  50%       { opacity: 0.3; transform: scaleY(0.5); transform-origin: top; }
+}
+
+/* ============================================================
+   STATEMENT SECTION
+   ============================================================ */
+.statement-section {
+  padding: 12vh 2.5rem;
+}
+.statement-inner {
+  max-width: 860px;
+  margin: 0 auto;
+  text-align: center;
+}
+.statement-text {
+  font-family: var(--font-serif);
+  font-size: clamp(2rem, 4.5vw, 3.75rem);
+  line-height: 1.4;
+  margin-bottom: 2rem;
+}
+.sw {
+  display: inline-block;
+  color: rgba(255,255,255,0.18);
+  margin-right: 0.22em;
+  will-change: color;
+}
+.sw.accent-word { color: rgba(255,255,255,0.18); }
+.statement-sub {
+  font-size: 1.125rem;
+  color: var(--muted);
+  opacity: 0;
+  transform: translateY(16px);
+  will-change: opacity, transform;
+}
+
+/* ============================================================
+   FEATURES SECTION
+   ============================================================ */
+.features-section {
+  padding: 8rem 2.5rem;
+}
+.features-header {
+  text-align: center;
+  max-width: 580px;
+  margin: 0 auto 6rem;
+  will-change: transform, opacity;
+}
+
+/* Feature block — alternating layout */
+.feature-block {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5rem;
+  align-items: center;
+  max-width: 1140px;
+  margin: 0 auto 7rem;
+}
+.feature-block:last-child { margin-bottom: 0; }
+.feature-block.flip { direction: rtl; }
+.feature-block.flip > * { direction: ltr; }
+
+/* Feature visual containers */
+.feature-visual {
+  position: relative;
+  min-height: 320px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  will-change: transform, opacity;
+}
+.fv-icon-wrap {
+  position: relative;
+  width: 96px; height: 96px;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(255,255,255,0.035);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 26px;
+  z-index: 2;
+}
+.fv-glow {
+  position: absolute;
+  inset: -1px;
+  border-radius: 26px;
+}
+.fv-glow.glow-teal   { box-shadow: 0 0 50px rgba(62,207,178,0.3);   border: 1px solid rgba(62,207,178,0.28); }
+.fv-glow.glow-blue   { box-shadow: 0 0 50px rgba(100,150,255,0.3);  border: 1px solid rgba(100,150,255,0.28); }
+.fv-glow.glow-purple { box-shadow: 0 0 50px rgba(190,120,255,0.3);  border: 1px solid rgba(190,120,255,0.28); }
+.fv-emoji {
+  font-size: 2.5rem;
+  position: relative;
+  z-index: 1;
+}
+
+/* Voice rings */
+.voice-rings {
+  position: absolute;
+  inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  pointer-events: none;
+}
+.vring {
+  position: absolute;
+  border: 1px solid rgba(62,207,178,0.13);
+  border-radius: 50%;
+  animation: vring-expand 3.2s ease-out infinite;
+}
+.vring-1 { width: 150px; height: 150px; animation-delay: 0.0s; }
+.vring-2 { width: 200px; height: 200px; animation-delay: 0.9s; }
+.vring-3 { width: 258px; height: 258px; animation-delay: 1.8s; }
+@keyframes vring-expand {
+  0%   { opacity: 0.5; transform: scale(0.82); }
+  100% { opacity: 0;   transform: scale(1.0); }
+}
+
+/* AI dots grid */
+.ai-dots {
+  position: absolute;
+  top: 8%;
+  left: 50%; transform: translateX(-50%);
+  display: grid;
+  grid-template-columns: repeat(3, 54px);
+  grid-template-rows: repeat(2, 54px);
+  gap: 18px;
+  opacity: 0.3;
+}
+.ai-dot {
+  width: 38px; height: 38px;
+  border: 1px solid rgba(100,150,255,0.45);
+  border-radius: 10px;
+  animation: ai-node-pulse 2.4s ease-in-out infinite;
+}
+.ai-dot:nth-child(odd)  { animation-delay: 0.6s; }
+.ai-dot:nth-child(3n)   { animation-delay: 1.2s; }
+@keyframes ai-node-pulse {
+  0%, 100% { background: transparent; }
+  50%       { background: rgba(100,150,255,0.15); }
+}
+
+/* Doc ghost */
+.doc-ghost {
+  position: absolute;
+  right: 8%;
+  top: 12%;
+  width: 150px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.09);
+  border-radius: 12px;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+.dline { height: 7px; background: rgba(255,255,255,0.1); border-radius: 4px; width: 100%; }
+.dline.short  { width: 55%; }
+.dline.medium { width: 78%; }
+
+/* Feature content */
+.feature-content { will-change: transform, opacity; }
+.feature-num {
+  display: block;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  color: var(--teal);
+  opacity: 0.65;
+  margin-bottom: 0.875rem;
+  text-transform: uppercase;
+}
+.feature-content h3 {
+  font-family: var(--font-serif);
+  font-size: clamp(1.75rem, 3vw, 2.5rem);
+  line-height: 1.18;
+  margin-bottom: 1rem;
+}
+.feature-content p {
+  color: var(--dim);
+  line-height: 1.82;
+  margin-bottom: 1.5rem;
+  font-size: 0.9375rem;
+}
+.feature-list { list-style: none; display: flex; flex-direction: column; gap: 0.625rem; }
+.feature-list li {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: var(--dim);
+  font-size: 0.9375rem;
+}
+.feature-list li::before {
+  content: '';
+  display: inline-block;
+  width: 5px; height: 5px;
+  background: var(--teal);
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* ============================================================
+   HOW IT WORKS — PINNED SECTION
+   ============================================================ */
+.how-section {
+  position: relative;
+  background: linear-gradient(to bottom, var(--navy), var(--navy-deep));
+}
+.how-sticky {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 4rem 2.5rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+.how-header { margin-bottom: 3.5rem; will-change: transform, opacity; }
+
+/* Step cards */
+.how-steps {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+}
+.how-step {
+  background: rgba(255,255,255,0.028);
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  padding: 2.5rem;
+  will-change: transform, opacity;
+  transform: translateY(28px);
+  opacity: 0;
+}
+.hs-number {
+  font-family: var(--font-serif);
+  font-size: 3.75rem;
+  color: rgba(255,255,255,0.05);
+  line-height: 1;
+  margin-bottom: 1rem;
+}
+.hs-icon { font-size: 1.75rem; margin-bottom: 1rem; }
+.how-step h3 { font-size: 1.1875rem; font-weight: 600; margin-bottom: 0.75rem; }
+.how-step p {
+  color: var(--dim);
+  font-size: 0.9375rem;
+  line-height: 1.78;
+  margin-bottom: 1.25rem;
+}
+.hs-tag {
+  display: inline-block;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--teal);
+  background: rgba(62,207,178,0.09);
+  border: 1px solid rgba(62,207,178,0.2);
+  padding: 0.3rem 0.75rem;
+  border-radius: 100px;
+}
+
+/* Progress bar */
+.how-progress-bar {
+  margin-top: 3rem;
+  height: 2px;
+  background: rgba(255,255,255,0.06);
+  border-radius: 1px;
+  overflow: hidden;
+}
+.how-progress-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, var(--teal), #5addc6);
+  border-radius: 1px;
+  transition: width 0.3s ease;
+}
+
+/* ============================================================
+   TRUST SECTION  (light)
+   ============================================================ */
+.trust-section {
+  padding: 9rem 2.5rem;
+  background: var(--off-white);
+  color: var(--navy);
+}
+.trust-inner { max-width: 1140px; margin: 0 auto; }
+.trust-text  { margin-bottom: 4rem; }
+.trust-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.75rem;
+}
+.trust-card {
+  background: var(--white);
+  border-radius: 22px;
+  padding: 2.5rem;
+  box-shadow: 0 4px 24px rgba(15,31,61,0.07);
+  border: 1px solid rgba(15,31,61,0.06);
+  will-change: transform, opacity;
+}
+.trust-icon { display: block; font-size: 2rem; margin-bottom: 1.375rem; }
+.trust-card h4 {
+  font-family: var(--font-serif);
+  font-size: 1.4375rem;
+  color: var(--navy);
+  margin-bottom: 0.75rem;
+}
+.trust-card p {
+  color: rgba(15,31,61,0.56);
+  font-size: 0.9375rem;
+  line-height: 1.78;
+}
+
+/* ============================================================
+   CTA SECTION
+   ============================================================ */
+.cta-section {
+  padding: 11rem 2.5rem;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  background: var(--navy-deep);
+}
+.cta-glow {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 900px; height: 600px;
+  background: radial-gradient(ellipse, rgba(62,207,178,0.1) 0%, transparent 72%);
+  pointer-events: none;
+  will-change: transform;
+}
+.cta-inner {
+  position: relative;
+  z-index: 1;
+  max-width: 680px;
+  margin: 0 auto;
+}
+.cta-title {
+  font-family: var(--font-serif);
+  font-size: clamp(2.75rem, 5.5vw, 5.25rem);
+  line-height: 1.08;
+  margin-bottom: 1.5rem;
+  will-change: transform, opacity;
+}
+.cta-title em { font-style: italic; color: var(--teal); }
+.cta-sub {
+  font-size: 1.125rem;
+  color: var(--dim);
+  margin-bottom: 2.75rem;
+  will-change: transform, opacity;
+}
+.cta-note {
+  margin-top: 1.5rem;
+  font-size: 0.8125rem;
+  color: var(--muted);
+}
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+.footer {
+  border-top: 1px solid var(--border);
+  padding: 2.5rem 2.5rem;
+  background: var(--navy-deep);
+}
+.footer-inner {
+  max-width: 1240px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+.footer-copy { font-size: 0.8125rem; color: var(--muted); }
+.footer-tag  { font-size: 0.8125rem; color: var(--muted); font-style: italic; }
+
+/* ============================================================
+   MOBILE RESPONSIVE
+   ============================================================ */
+@media (max-width: 900px) {
+  .hero {
+    grid-template-columns: 1fr;
+    text-align: center;
+    padding-top: 7rem;
+  }
+  .hero-sub, .hero-cta-group { margin-left: auto; margin-right: auto; }
+  .hero-cta-group { justify-content: center; }
+  .hero-visual { display: none; }
+  .nav-links { display: none; }
+
+  .feature-block {
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+  }
+  .feature-block.flip { direction: ltr; }
+  .feature-visual { min-height: 180px; }
+
+  .how-steps {
+    grid-template-columns: 1fr;
+  }
+
+  .trust-grid { grid-template-columns: 1fr; }
+
+  .footer-inner { flex-direction: column; text-align: center; }
+}
+
+@media (max-width: 540px) {
+  .hero-title { font-size: 3.25rem; }
+  .cta-title  { font-size: 2.5rem; }
+  .section-title { font-size: 2.25rem; }
+  .statement-text { font-size: 1.875rem; }
+}
+
+/* ============================================================
+   INITIAL HIDDEN STATES (for GSAP)
+   ============================================================ */
+.hero-badge,
+.hero-title .word,
+.hero-sub,
+.hero-cta-group,
+.phone-mockup,
+.report-card,
+.scroll-hint {
+  will-change: transform, opacity;
+}
+  </style>
+</head>
+<body>
+
+  <!-- ========== NAV ========== -->
+  <nav class="nav" id="nav">
+    <div class="nav-inner">
+      <a href="#" class="nav-logo">
+        <span class="logo-mark">◎</span>
+        <span>EchoMemo</span>
+      </a>
+      <div class="nav-links">
+        <a href="#features">Features</a>
+        <a href="#how-it-works">How it works</a>
+        <a href="#contact" class="nav-cta">Get in touch</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ========== HERO ========== -->
+  <section class="hero" id="hero">
+    <div class="hero-bg-grid"></div>
+    <div class="hero-glow"></div>
+
+    <div class="hero-content">
+      <div class="hero-badge">
+        <span class="badge-dot"></span>
+        Built for schools
+      </div>
+      <h1 class="hero-title">
+        <span class="title-line">
+          <span class="word">Your</span><span class="word">voice.</span>
+        </span>
+        <span class="title-line teal-line">
+          <span class="word italic-word">Their</span><span class="word italic-word">story.</span>
+        </span>
+      </h1>
+      <p class="hero-sub">
+        Record a pastoral conversation, upload the audio, and EchoMemo delivers a
+        structured, professional report — in seconds.
+      </p>
+      <div class="hero-cta-group">
+        <a href="#contact" class="btn-primary">Talk to our team</a>
+        <a href="#how-it-works" class="btn-ghost">See how it works <span class="arrow">↓</span></a>
+      </div>
+    </div>
+
+    <div class="hero-visual">
+      <!-- Phone mockup -->
+      <div class="phone-mockup">
+        <div class="phone-frame">
+          <div class="phone-notch"></div>
+          <div class="phone-screen">
+            <div class="app-topbar">
+              <span class="app-title">EchoMemo</span>
+              <span class="app-status-dot"></span>
+            </div>
+            <div class="app-waveform">
+              <div class="wave-bar"></div><div class="wave-bar"></div>
+              <div class="wave-bar"></div><div class="wave-bar"></div>
+              <div class="wave-bar"></div><div class="wave-bar"></div>
+              <div class="wave-bar"></div><div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+            </div>
+            <div class="app-record-btn">
+              <div class="record-ring r1"></div>
+              <div class="record-ring r2"></div>
+              <div class="record-core"></div>
+            </div>
+            <div class="app-label">Tap to record</div>
+            <div class="app-bottom-bar">
+              <div class="app-tab active">Record</div>
+              <div class="app-tab">History</div>
+              <div class="app-tab">Settings</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Floating report card -->
+      <div class="report-card floating-card">
+        <div class="report-card-header">
+          <span class="dot red"></span>
+          <span class="dot amber"></span>
+          <span class="dot green"></span>
+          <span class="report-filename">pastoral_report_yr10.docx</span>
+        </div>
+        <div class="report-card-body">
+          <div class="report-label-tag">Pastoral Report</div>
+          <div class="rline lg"></div>
+          <div class="rline md"></div>
+          <div class="rline sm"></div>
+          <div class="rspacer"></div>
+          <div class="rtag">🎙 Audio processed</div>
+          <div class="rtag teal-tag">✓ Report ready</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="scroll-hint">
+      <div class="scroll-line"></div>
+      <span>Scroll</span>
+    </div>
+  </section>
+
+  <!-- ========== STATEMENT SECTION ========== -->
+  <section class="statement-section" id="statement">
+    <div class="statement-inner">
+      <p class="statement-text">
+        <span class="sw">Every</span>
+        <span class="sw">pastoral</span>
+        <span class="sw">conversation</span>
+        <span class="sw">deserves</span>
+        <span class="sw accent-word">a</span>
+        <span class="sw accent-word">proper</span>
+        <span class="sw accent-word">record.</span>
+      </p>
+      <p class="statement-sub">
+        EchoMemo turns spoken words into structured safeguarding reports — automatically.
+      </p>
+    </div>
+  </section>
+
+  <!-- ========== FEATURES ========== -->
+  <section class="features-section" id="features">
+    <div class="features-header">
+      <span class="section-label">Features</span>
+      <h2 class="section-title">Everything a pastoral lead needs</h2>
+      <p class="section-sub">No typing. No templates. Just speak — we handle the rest.</p>
+    </div>
+
+    <!-- Feature 1 — Voice -->
+    <div class="feature-block" data-dir="left">
+      <div class="feature-visual fv-voice">
+        <div class="fv-icon-wrap">
+          <div class="fv-glow glow-teal"></div>
+          <span class="fv-emoji">🎙</span>
+        </div>
+        <div class="voice-rings">
+          <div class="vring vring-1"></div>
+          <div class="vring vring-2"></div>
+          <div class="vring vring-3"></div>
+        </div>
+      </div>
+      <div class="feature-content">
+        <span class="feature-num">01</span>
+        <h3>Voice-first input</h3>
+        <p>Upload any audio file from any device — MP3, M4A, WAV, even video files. Our system extracts the audio automatically. No special equipment required.</p>
+        <ul class="feature-list">
+          <li>Works with any recording app</li>
+          <li>Supports MP3, M4A, WAV, MP4, MOV</li>
+          <li>Record directly on mobile or upload later</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Feature 2 — AI -->
+    <div class="feature-block flip" data-dir="right">
+      <div class="feature-visual fv-ai">
+        <div class="fv-icon-wrap">
+          <div class="fv-glow glow-blue"></div>
+          <span class="fv-emoji">⚡</span>
+        </div>
+        <div class="ai-dots">
+          <div class="ai-dot"></div><div class="ai-dot"></div>
+          <div class="ai-dot"></div><div class="ai-dot"></div>
+          <div class="ai-dot"></div><div class="ai-dot"></div>
+        </div>
+      </div>
+      <div class="feature-content">
+        <span class="feature-num">02</span>
+        <h3>AI transcription &amp; analysis</h3>
+        <p>Powered by Whisper AI speech recognition, EchoMemo handles accents, background noise, and complex pastoral language with exceptional precision.</p>
+        <ul class="feature-list">
+          <li>State-of-the-art Whisper AI</li>
+          <li>Accent and dialect support</li>
+          <li>Extracts key safeguarding insights</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Feature 3 — Reports -->
+    <div class="feature-block" data-dir="left">
+      <div class="feature-visual fv-doc">
+        <div class="fv-icon-wrap">
+          <div class="fv-glow glow-purple"></div>
+          <span class="fv-emoji">📄</span>
+        </div>
+        <div class="doc-ghost">
+          <div class="dline"></div>
+          <div class="dline short"></div>
+          <div class="dline"></div>
+          <div class="dline medium"></div>
+          <div class="dline short"></div>
+        </div>
+      </div>
+      <div class="feature-content">
+        <span class="feature-num">03</span>
+        <h3>Structured reports, instantly</h3>
+        <p>A professionally formatted Word document lands in your OneDrive within seconds. Consistent, complete, and ready to file — every single time.</p>
+        <ul class="feature-list">
+          <li>Saved directly to staff OneDrive</li>
+          <li>Consistent formatting every time</li>
+          <li>Ready to share or file immediately</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== HOW IT WORKS (pinned) ========== -->
+  <section class="how-section" id="how-it-works">
+    <div class="how-sticky">
+      <div class="how-header">
+        <span class="section-label">How it works</span>
+        <h2 class="section-title">Three steps.<br><em>That's it.</em></h2>
+      </div>
+      <div class="how-steps">
+        <div class="how-step hs-1">
+          <div class="hs-number">01</div>
+          <div class="hs-icon">🎙</div>
+          <h3>Record or upload</h3>
+          <p>After your pastoral conversation, open EchoMemo on your phone. Record directly, pick from your files, or upload from your camera roll.</p>
+          <div class="hs-tag">iOS &amp; Android</div>
+        </div>
+        <div class="how-step hs-2">
+          <div class="hs-number">02</div>
+          <div class="hs-icon">⚡</div>
+          <h3>AI does the work</h3>
+          <p>EchoMemo transcribes the audio using Whisper AI, then extracts key pastoral insights, concerns, and action points from the conversation.</p>
+          <div class="hs-tag">Takes seconds</div>
+        </div>
+        <div class="how-step hs-3">
+          <div class="hs-number">03</div>
+          <div class="hs-icon">📁</div>
+          <h3>Report in OneDrive</h3>
+          <p>A structured Word document appears in your OneDrive folder — consistent, professional formatting, ready to share or file immediately.</p>
+          <div class="hs-tag">Microsoft 365</div>
+        </div>
+      </div>
+      <div class="how-progress-bar">
+        <div class="how-progress-fill"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== TRUST / SECURITY ========== -->
+  <section class="trust-section">
+    <div class="trust-inner">
+      <div class="trust-text">
+        <span class="section-label dark-label">Security &amp; Privacy</span>
+        <h2 class="section-title dark-title">Built for schools.<br><em class="dark-em">Designed to be trusted.</em></h2>
+        <p class="section-sub dark-sub">Sensitive pastoral data needs to stay where it belongs — inside your school.</p>
+      </div>
+      <div class="trust-grid">
+        <div class="trust-card">
+          <span class="trust-icon">🔒</span>
+          <h4>Microsoft sign-in</h4>
+          <p>Staff log in with their existing school Microsoft account. No new passwords, no new accounts.</p>
+        </div>
+        <div class="trust-card">
+          <span class="trust-icon">🏫</span>
+          <h4>On-premise processing</h4>
+          <p>Audio is transcribed on your school's own infrastructure. Your data never leaves your network.</p>
+        </div>
+        <div class="trust-card">
+          <span class="trust-icon">📁</span>
+          <h4>Saves to your OneDrive</h4>
+          <p>Reports go directly to each staff member's OneDrive folder. Always in your control.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== CTA ========== -->
+  <section class="cta-section" id="contact">
+    <div class="cta-glow"></div>
+    <div class="cta-inner">
+      <span class="section-label">Get started</span>
+      <h2 class="cta-title">Ready to save<br><em>hours every week?</em></h2>
+      <p class="cta-sub">EchoMemo is built for schools like yours. Get in touch to discuss a pilot.</p>
+      <a href="mailto:hello@echomemo.com" class="btn-primary btn-large">Contact our team →</a>
+      <p class="cta-note">No contract. No commitment. Just a conversation.</p>
+    </div>
+  </section>
+
+  <!-- ========== FOOTER ========== -->
+  <footer class="footer">
+    <div class="footer-inner">
+      <a href="#" class="nav-logo">
+        <span class="logo-mark">◎</span>
+        <span>EchoMemo</span>
+      </a>
+      <p class="footer-copy">© 2025 EchoMemo. All rights reserved.</p>
+      <p class="footer-tag">Pastoral reporting, reimagined.</p>
+    </div>
+  </footer>
+
+  <script>
+/* ============================================================
+   ECHOMEMO — SCROLL ANIMATION ENGINE
+   GSAP + ScrollTrigger
+   ============================================================ */
+
+gsap.registerPlugin(ScrollTrigger);
+
+/* ============================================================
+   NAV — frosted glass on scroll
+   ============================================================ */
+const nav = document.getElementById('nav');
+ScrollTrigger.create({
+  start: 60,
+  onEnter:  () => nav.classList.add('scrolled'),
+  onLeaveBack: () => nav.classList.remove('scrolled'),
+});
+
+/* ============================================================
+   HERO — staggered entrance
+   ============================================================ */
+const heroTl = gsap.timeline({ defaults: { ease: 'power4.out' } });
+
+// Set initial states
+gsap.set(['.hero-badge', '.hero-sub', '.hero-cta-group', '.scroll-hint'], {
+  opacity: 0, y: 24
+});
+gsap.set('.hero-title .word', { opacity: 0, y: 70, rotateX: -12 });
+gsap.set('.phone-mockup',  { opacity: 0, y: 50, scale: 0.93 });
+gsap.set('.report-card',   { opacity: 0, x: 28, y: 16, scale: 0.92 });
+
+heroTl
+  .to('.hero-badge', { opacity: 1, y: 0, duration: 0.75, delay: 0.15 })
+  .to('.hero-title .word', {
+    opacity: 1, y: 0, rotateX: 0,
+    stagger: 0.09, duration: 1.1,
+    transformOrigin: 'center bottom'
+  }, '-=0.4')
+  .to('.hero-sub',       { opacity: 1, y: 0, duration: 0.85 }, '-=0.65')
+  .to('.hero-cta-group', { opacity: 1, y: 0, duration: 0.7  }, '-=0.6')
+  .to('.phone-mockup',   { opacity: 1, y: 0, scale: 1, duration: 1.2, ease: 'power3.out' }, '-=0.85')
+  .to('.report-card',    { opacity: 1, x: 0, y: 0, scale: 1, duration: 1.0, ease: 'power3.out' }, '-=0.75')
+  .to('.scroll-hint',    { opacity: 1, y: 0, duration: 0.6 }, '-=0.4');
+
+/* ============================================================
+   HERO — parallax on scroll
+   ============================================================ */
+gsap.to('.phone-mockup', {
+  yPercent: 18, ease: 'none',
+  scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: true }
+});
+gsap.to('.report-card', {
+  yPercent: 30, ease: 'none',
+  scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: true }
+});
+gsap.to('.hero-glow', {
+  yPercent: 35, ease: 'none',
+  scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: true }
+});
+
+/* ============================================================
+   STATEMENT SECTION — word-by-word scrub reveal
+   ============================================================ */
+const stWords = gsap.utils.toArray('.sw');
+gsap.set(stWords, { color: 'rgba(255,255,255,0.15)' });
+gsap.set('.statement-sub', { opacity: 0, y: 18 });
+
+const stTl = gsap.timeline({
+  scrollTrigger: {
+    trigger: '.statement-section',
+    start: 'top 80%',
+    end: 'bottom 55%',
+    scrub: 1.8,
+  }
+});
+stWords.forEach((word, i) => {
+  const isAccent = word.classList.contains('accent-word');
+  stTl.to(word, {
+    color: isAccent ? '#3ECFB2' : 'rgba(255,255,255,0.92)',
+    duration: 0.5
+  }, i * 0.14);
+});
+stTl.to('.statement-sub', { opacity: 1, y: 0, duration: 0.8 }, stWords.length * 0.14);
+
+/* ============================================================
+   FEATURES HEADER
+   ============================================================ */
+gsap.set('.features-header', { opacity: 0, y: 48 });
+gsap.to('.features-header', {
+  opacity: 1, y: 0, duration: 1.1, ease: 'power3.out',
+  scrollTrigger: {
+    trigger: '.features-header',
+    start: 'top 82%',
+    toggleActions: 'play none none reverse'
+  }
+});
+
+/* ============================================================
+   FEATURES — slide in from alternating sides
+   ============================================================ */
+document.querySelectorAll('.feature-block').forEach((block) => {
+  const dir    = block.dataset.dir; // 'left' or 'right'
+  const content = block.querySelector('.feature-content');
+  const visual  = block.querySelector('.feature-visual');
+
+  // Content slides in from the text side
+  gsap.set(content, { opacity: 0, x: dir === 'left' ? -56 : 56 });
+  gsap.set(visual,  { opacity: 0, x: dir === 'left' ?  56 : -56 });
+
+  const featureTl = gsap.timeline({
+    scrollTrigger: {
+      trigger: block,
+      start: 'top 78%',
+      toggleActions: 'play none none reverse'
+    }
+  });
+  featureTl
+    .to(content, { opacity: 1, x: 0, duration: 1.0, ease: 'power3.out' })
+    .to(visual,  { opacity: 1, x: 0, duration: 1.0, ease: 'power3.out' }, '-=0.75');
+});
+
+/* ============================================================
+   HOW IT WORKS — pinned section, steps reveal with scroll
+   ============================================================ */
+gsap.set('.how-header', { opacity: 0, y: 32 });
+
+const howTl = gsap.timeline({
+  scrollTrigger: {
+    trigger: '.how-section',
+    start: 'top top',
+    end: '+=220%',
+    pin: true,
+    scrub: 1.2,
+    anticipatePin: 1,
+  }
+});
+
+howTl
+  // Header fades in
+  .to('.how-header', { opacity: 1, y: 0, duration: 0.5 })
+  // Step 1 animates in
+  .to('.hs-1', {
+    opacity: 1, y: 0, duration: 0.5,
+    borderColor: 'rgba(62,207,178,0.35)',
+  }, '+=0.1')
+  // Step 2
+  .to('.hs-2', {
+    opacity: 1, y: 0, duration: 0.5,
+    borderColor: 'rgba(62,207,178,0.35)',
+  }, '+=0.3')
+  // Step 3
+  .to('.hs-3', {
+    opacity: 1, y: 0, duration: 0.5,
+    borderColor: 'rgba(62,207,178,0.35)',
+  }, '+=0.3');
+
+// Progress bar tracks overall timeline progress
+ScrollTrigger.create({
+  trigger: '.how-section',
+  start: 'top top',
+  end: '+=220%',
+  onUpdate: (self) => {
+    document.querySelector('.how-progress-fill').style.width =
+      `${self.progress * 100}%`;
+  }
+});
+
+/* ============================================================
+   TRUST SECTION — cards stagger in
+   ============================================================ */
+gsap.set('.trust-text', { opacity: 0, y: 40 });
+gsap.set('.trust-card', { opacity: 0, y: 44, scale: 0.97 });
+
+gsap.to('.trust-text', {
+  opacity: 1, y: 0, duration: 1.0, ease: 'power3.out',
+  scrollTrigger: {
+    trigger: '.trust-section',
+    start: 'top 80%',
+    toggleActions: 'play none none reverse'
+  }
+});
+gsap.to('.trust-card', {
+  opacity: 1, y: 0, scale: 1,
+  stagger: 0.14, duration: 0.85, ease: 'power3.out',
+  scrollTrigger: {
+    trigger: '.trust-grid',
+    start: 'top 82%',
+    toggleActions: 'play none none reverse'
+  }
+});
+
+/* ============================================================
+   CTA SECTION — cinematic reveal
+   ============================================================ */
+gsap.set(['.cta-section .section-label', '.cta-title', '.cta-sub',
+          '.cta-section .btn-primary', '.cta-note'], {
+  opacity: 0, y: 32
+});
+
+const ctaTl = gsap.timeline({
+  scrollTrigger: {
+    trigger: '.cta-section',
+    start: 'top 78%',
+    toggleActions: 'play none none reverse'
+  }
+});
+ctaTl
+  .to('.cta-section .section-label', { opacity: 1, y: 0, duration: 0.65 })
+  .to('.cta-title',   { opacity: 1, y: 0, duration: 1.1, ease: 'power3.out' }, '-=0.3')
+  .to('.cta-sub',     { opacity: 1, y: 0, duration: 0.85, ease: 'power3.out' }, '-=0.65')
+  .to('.cta-section .btn-primary', {
+    opacity: 1, y: 0, scale: 1, duration: 0.75, ease: 'back.out(1.4)'
+  }, '-=0.5')
+  .to('.cta-note', { opacity: 1, y: 0, duration: 0.5 }, '-=0.2');
+
+// CTA glow breathes with scroll position
+gsap.to('.cta-glow', {
+  scale: 1.35, ease: 'none',
+  scrollTrigger: {
+    trigger: '.cta-section',
+    start: 'top bottom',
+    end: 'bottom top',
+    scrub: true
+  }
+});
+
+/* ============================================================
+   FOOTER — fade in
+   ============================================================ */
+gsap.set('.footer', { opacity: 0 });
+gsap.to('.footer', {
+  opacity: 1, duration: 0.9,
+  scrollTrigger: {
+    trigger: '.footer',
+    start: 'top 92%',
+    toggleActions: 'play none none none'
+  }
+});
+  </script>
+</body>
+</html>
