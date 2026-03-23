@@ -57,7 +57,7 @@
 
 /* ---- Reset ---- */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; scroll-snap-type: y proximity; }
+html { scroll-behavior: smooth; }
 body {
   background: var(--navy);
   color: var(--white);
@@ -554,7 +554,13 @@ img { display: block; max-width: 100%; }
    STATEMENT SECTION
    ============================================================ */
 .statement-section {
-  padding: 6vh 2.5rem;
+  min-height: 100svh;
+  display: flex;
+  align-items: center;
+  padding: 6rem 2.5rem;
+  background: var(--navy-deep);
+  position: relative;
+  z-index: 1;
 }
 .statement-inner {
   max-width: 860px;
@@ -587,6 +593,9 @@ img { display: block; max-width: 100%; }
    ============================================================ */
 .features-section {
   padding: 4.5rem 2.5rem;
+  background: var(--navy);
+  position: relative;
+  z-index: 1;
 }
 .features-header {
   text-align: center;
@@ -930,14 +939,6 @@ img { display: block; max-width: 100%; }
 /* ============================================================
    MOBILE RESPONSIVE
    ============================================================ */
-.hero,
-.statement-section,
-.features-section,
-.trust-section,
-.cta-section {
-  scroll-snap-align: start;
-  scroll-snap-stop: normal;
-}
 
 @media (max-width: 900px) {
   .hero {
